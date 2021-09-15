@@ -1,0 +1,3 @@
+[submodule "media_player"]
+	path = media_player
+	url = git@github.com:numatanumanuma/media_player.git
