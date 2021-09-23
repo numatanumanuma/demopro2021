@@ -2,7 +2,7 @@
 #include "../include/FJT.h"
 
 
-void servo_pubNode::on_and_off(){
+void servo_pubNode::on_off(){
     sleep(1);
     pattern.data = 1;
     pub_pattern.publish(pattern);

@@ -24,7 +24,7 @@ class servo_pubNode
         
         void on();
         void off();
-        void on_and_off();
+        void on_off();
 
 };
 
