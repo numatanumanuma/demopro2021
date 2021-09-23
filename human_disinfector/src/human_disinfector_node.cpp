@@ -7,6 +7,7 @@
 
 #include "human_disinfector/human_detector.h"
 #include "sound_player/sound_player.h"
+#include "../include/FJT.h"
 #include "kbhit.h"
 
 #define POS_TOLERANCE 0.001        // 状態遷移時に許容する位置誤差 [m]
@@ -79,6 +80,7 @@ int main(int argc, char **argv)
     ros::spinOnce();
 
     Detector detector;
+    servo_pubNode servo;
     SoundPlayer player;
     player.setSound(obutu1_sound);
 
@@ -101,12 +103,21 @@ int main(int argc, char **argv)
             {
             case '1':
                 player.play();
-                key = '@';
-                std::cout << "hai" << std::endl;
+                servo.on();
+                std::cout << "on" << std::endl;
+                break;
+            case '2':
+                servo.off();
+                std::cout << "off" << std::endl;
+                break;
+            case '3':
+                servo.on_off();
+                std::cout << "on off" << std::endl;
                 break;
             default:
                 break;
             }
+            key = '@';
             continue;
         }
 

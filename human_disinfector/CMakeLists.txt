@@ -213,9 +213,12 @@ include_directories(
 add_library(human_detector src/human_detector.cpp)
 target_link_libraries(human_detector ${catkin_LIBRARIES})
 
+add_library(servo src/FJT.cpp)
+target_link_libraries(servo ${catkin_LIBRARIES})
+
 add_executable(human_disinfector_node src/human_disinfector_node.cpp)
 add_dependencies(human_disinfector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(human_disinfector_node human_detector ${catkin_LIBRARIES})
+target_link_libraries(human_disinfector_node human_detector servo ${catkin_LIBRARIES})
 
 
 
