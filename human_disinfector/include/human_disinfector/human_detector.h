@@ -5,6 +5,9 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Image.h>
 #include <darknet_ros_msgs/BoundingBoxes.h>
+#include <image_transport/image_transport.h>
+#include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
 
 #define Disp(x) std::cout << #x << ':' << x << std::endl
    
@@ -29,13 +32,13 @@ private:
 
     ros::Publisher twist_pub_;
     ros::Subscriber darknet_sub_;
-    ros::Subscriber depth_sub_;
+    // ros::Subscriber depth_sub_;
+    image_transport::Subscriber depth_sub_;
     ros::Timer timer_;
     geometry_msgs::Twist twist_;
     darknet_ros_msgs::BoundingBoxes bb_results_;
-    sensor_msgs::Image depth_results_;
-
-
+    // sensor_msgs::Image depth_results_;
+    cv_bridge::CvImage depth_img_;
 };
 
 #endif
