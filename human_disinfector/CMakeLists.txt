@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   sound_player
   std_msgs
   sensor_msgs
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -123,6 +124,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -210,9 +212,10 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+find_package(OpenCV REQUIRED)
 
 add_library(human_detector src/human_detector.cpp)
-target_link_libraries(human_detector ${catkin_LIBRARIES})
+target_link_libraries(human_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 add_library(servo src/FJT.cpp)
 target_link_libraries(servo ${catkin_LIBRARIES})

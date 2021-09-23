@@ -61,13 +61,24 @@ bool checkTimer() {
     }
 }
 
+double getDist(double degree) {
+    int i = (- scan.angle_min + degree * M_PI / 180) / scan.angle_increment;
+    if (i >= 0 && i < scan.ranges.size()){
+        if (scan.ranges[i] >= scan.range_min &&
+            scan.ranges[i] <= scan.range_max &&
+            ! std::isnan(scan.ranges[i])){
+            return scan.ranges[i];
+        }
+    }
+    return -1;
+}
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "human_disinfector");
     
     ros::NodeHandle nh("~");
-    ros::Rate looprate(10);
+    ros::Rate looprate(2);
 
     std::string obutu1_sound;
     bool debug;
@@ -88,17 +99,26 @@ int main(int argc, char **argv)
     geometry_msgs::Pose ref_pose; // 基準となる姿勢
     geometry_msgs::Pose now_pose; // 現在の姿勢
     sensor_msgs::LaserScan scan;
+    double human_dir = 0;
+    double human_dist = 0;
 
     char key = '@';
     int state = 0;
 
     while(ros::ok()) {
 
-        if (kbhit()) {
-            std::cin >> key;
-            std::cout << "input key... " << key << std::endl;
-        }
+        double dir, dist;
+        detector.getHumanDirAndDist(dir, dist);
+        human_dir   = dir;
+        human_dist  = dist;
+        // human_dist  = getDist(dir);
+        std::cout << human_dir << ", "<< human_dist << std::endl;
+
         if (debug) {
+            if (kbhit()) {
+                std::cin >> key;
+                std::cout << "input key... " << key << std::endl;
+            }
             switch (key)
             {
             case '1':
@@ -118,6 +138,8 @@ int main(int argc, char **argv)
                 break;
             }
             key = '@';
+            ros::spinOnce();
+            looprate.sleep();
             continue;
         }
 

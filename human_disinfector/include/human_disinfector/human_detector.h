@@ -5,6 +5,8 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/Image.h>
 #include <darknet_ros_msgs/BoundingBoxes.h>
+
+#define Disp(x) std::cout << #x << ':' << x << std::endl
    
 class Detector{
 public:

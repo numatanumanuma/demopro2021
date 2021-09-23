@@ -5,7 +5,7 @@ Detector::Detector(){
     twist_pub_ = nh.advertise<geometry_msgs::Twist>("/sample/cmd_vel", 10);
     darknet_sub_ = nh.subscribe("/darknet_ros/bounding_boxes", 100,
         &Detector::darknetCallback, this);
-    depth_sub_ = nh.subscribe("/camera/depth/image_rect_raw", 100,
+    depth_sub_ = nh.subscribe("/camera/aligned_depth_to_color/image_raw", 100,
         &Detector::depthCallback, this);
     timer_ = nh.createTimer(ros::Duration(0.05), &Detector::timerCallback, this);
     
@@ -33,10 +33,12 @@ void Detector::publishCurrentTwist(){
 // 人検出して，その人の方向(yaw)と距離を入れる
 void Detector::getHumanDirAndDist(double& dir, double& dist) {
     for(auto bb : bb_results_.bounding_boxes) {
-        if(bb.Class == "person" && bb.probability >= 0.7) {
+        Disp(bb.Class);
+        Disp(bb.probability);
+        if(bb.Class == "person" && bb.probability >= 0.5) {
             int xcenter = (bb.xmax - bb.xmin)/2;
             int ycenter = (bb.ymax - bb.ymin)/2;
-            double yaw_ratio = (camera_width - (bb.xmax - bb.xmin))/camera_width;
+            double yaw_ratio = double(camera_width - (bb.xmax - bb.xmin))/double(camera_width);
             dir = yaw_ratio*camera_angle;
 
             double tmp_dist = 1e5;
@@ -47,11 +49,12 @@ void Detector::getHumanDirAndDist(double& dir, double& dist) {
                     && 0 <= nowy && nowy < camera_height) {
                         int idx = nowy*camera_width + nowx;
                         double depth = depth_results_.data[idx];         
-                        if(tmp_dist < depth) tmp_dist = depth;
+                        if(tmp_dist > depth) tmp_dist = depth;
                     }
                 }
             }
-            dist = tmp_dist;
+            if(tmp_dist < 1e5) dist = tmp_dist;
+            return;
         }
     }
 }
