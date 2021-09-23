@@ -27,7 +27,7 @@ private:
 
     const int dist_search_range = 10; // デプス情報を探す範囲
     void darknetCallback(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg);
-    void depthCallback(const sensor_msgs::Image::ConstPtr& msg);
+    void depthCallback(const sensor_msgs::ImageConstPtr& msg);
     void publishCurrentTwist();
 
     ros::Publisher twist_pub_;
@@ -38,7 +38,8 @@ private:
     geometry_msgs::Twist twist_;
     darknet_ros_msgs::BoundingBoxes bb_results_;
     // sensor_msgs::Image depth_results_;
-    cv_bridge::CvImage depth_img_;
+    // cv_bridge::CvImage depth_img_;
+    cv::Mat depth_img_;
 };
 
 #endif

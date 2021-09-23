@@ -3,7 +3,8 @@
     <arg name="path" default="$(find human_disinfector)/media/"/>
 
     <node pkg="human_disinfector" name="human_disinfector" type="human_disinfector_node" output="screen" respawn="true">
-        <param name="obutu1_sound" value="$(arg path)obutuda_shodokuda.wav"/>
+        <param name="obutu_sound" value="$(arg path)obutuhasyoudokuda.wav"/>
+        <param name="mitiwoakero_sound" value="$(arg path)mitiwoakero.wav"/>
         <param name="debug" value="true"/>
     </node>
 

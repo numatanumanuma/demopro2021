@@ -80,20 +80,20 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("~");
     ros::Rate looprate(2);
 
-    std::string obutu1_sound;
+    std::string obutu_sound;
+    std::string mitiwoakero_sound;
     bool debug;
-    nh.param("obutu1_sound", obutu1_sound, std::string("obutuha_shodokuda.wav"));
+    nh.param("obutu_sound", obutu_sound, std::string("obutuhasyoudokuda.wav"));
+    nh.param("mitiwoakero_sound", mitiwoakero_sound, std::string("mitiwoakero.wav"));
     nh.param("debug", debug, true);
 
     ros::Publisher vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);;
     ros::Subscriber odom_sub = nh.subscribe("/odom", 10, odomCallback);
     ros::Subscriber scan_sub = nh.subscribe("/scan", 10, scanCallback);
-    ros::spinOnce();
 
     Detector detector;
     servo_pubNode servo;
     SoundPlayer player;
-    player.setSound(obutu1_sound);
 
     geometry_msgs::Twist twist_msg;
     geometry_msgs::Pose ref_pose; // 基準となる姿勢
@@ -104,14 +104,15 @@ int main(int argc, char **argv)
 
     char key = '@';
     int state = 0;
+    ros::spinOnce();
 
     while(ros::ok()) {
 
         double dir, dist;
         detector.getHumanDirAndDist(dir, dist);
         human_dir   = dir;
-        human_dist  = dist;
-        // human_dist  = getDist(dir);
+        // human_dist  = dist;
+        human_dist  = getDist(dir);
         std::cout << human_dir << ", "<< human_dist << std::endl;
 
         if (debug) {
@@ -122,6 +123,7 @@ int main(int argc, char **argv)
             switch (key)
             {
             case '1':
+                player.setSound(obutu_sound);
                 player.play();
                 servo.on();
                 std::cout << "on" << std::endl;
@@ -133,6 +135,14 @@ int main(int argc, char **argv)
             case '3':
                 servo.on_off();
                 std::cout << "on off" << std::endl;
+                break;
+            case '4':
+                player.setSound(obutu_sound);
+                player.play();
+                break;
+            case '5':
+                player.setSound(mitiwoakero_sound);
+                player.play();
                 break;
             default:
                 break;

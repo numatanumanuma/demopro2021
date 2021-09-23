@@ -10,7 +10,7 @@ Detector::Detector(){
     timer_ = nh.createTimer(ros::Duration(0.05), &Detector::timerCallback, this);
     
     image_transport::ImageTransport it(nh);
-    image_transport::Subscriber camera = it.subscribe("/camera/aligned_depth_to_color/image_raw", 1,
+    image_transport::Subscriber depth_sub_ = it.subscribe("/camera/aligned_depth_to_color/image_raw", 1,
         &Detector::depthCallback, this);
 }
 
@@ -20,12 +20,14 @@ void Detector::darknetCallback(const darknet_ros_msgs::BoundingBoxes::ConstPtr& 
     bb_results_ = *results;
 }
 
-void Detector::depthCallback(const sensor_msgs::Image::ConstPtr& msg) {
+void Detector::depthCallback(const sensor_msgs::ImageConstPtr& msg) {
     // depth_results_ = *msg;
+    // std::cout << "hello" << std::endl;
+    // ROSINFO("hello");
     cv_bridge::CvImageConstPtr cv_ptr;
     try {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_16UC1);
-        depth_img_ = *cv_ptr;
+        depth_img_ = cv_bridge::toCvShare(msg, sensor_msgs::image_encodings::TYPE_16UC1)->image;
+        // depth_img_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::TYPE_16UC1)->image;
     //   ROS_INFO("copied image");
     } catch (cv_bridge::Exception& e) {
       ROS_ERROR("cv_bridge exception: %s", e.what());
@@ -52,7 +54,9 @@ void Detector::getHumanDirAndDist(double& dir, double& dist) {
             int ycenter = (bb.ymax - bb.ymin)/2;
             double yaw_ratio = double(camera_width - (bb.xmax - bb.xmin))/double(camera_width);
             dir = yaw_ratio*camera_angle;
+            dist = -1;
 
+            /*
             double tmp_dist = 1e5;
             for(int i = -dist_search_range/2; i <= dist_search_range/2; i++) {
                 for(int j = -dist_search_range/2; j <= dist_search_range/2; j++) {
@@ -60,13 +64,21 @@ void Detector::getHumanDirAndDist(double& dir, double& dist) {
                     if(0 <= nowx && nowx < camera_width
                     && 0 <= nowy && nowy < camera_height) {
                         int idx = nowy*camera_width + nowx;
-                        // double depth = depth_results_.data[idx];      
-                        double depth = depth_img_.image.at<u_int16_t>(nowy, nowx);  
+                        // double depth = depth_results_.data[idx];   
+                        Disp(nowy);
+                        Disp(nowx);
+                        Disp(depth_img_.rows);
+                        Disp(depth_img_.cols);
+                        Disp(depth_img_.step);
+                        Disp(depth_img_.elemSize());
+                        // double depth = depth_img_.image.at<u_int16_t>(nowy, nowx);
+                        double depth = depth_img_.at<u_int16_t>(nowy, nowx);
                         if(tmp_dist > depth) tmp_dist = depth;
                     }
                 }
             }
             if(tmp_dist < 1e5) dist = tmp_dist;
+            */
             return;
         }
     }
