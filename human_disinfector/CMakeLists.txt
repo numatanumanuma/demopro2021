@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   rostime
   sound_player
   std_msgs
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -109,7 +110,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES human_disinfector
-  CATKIN_DEPENDS darknet_ros_msgs geometry_msgs roscpp rospy rostime sound_player std_msgs
+  CATKIN_DEPENDS darknet_ros_msgs geometry_msgs roscpp rospy rostime sound_player std_msgs sensor_msgs
 #  DEPENDS system_lib
 )
 
