@@ -224,10 +224,12 @@ target_link_libraries(servo ${catkin_LIBRARIES})
 #add_library(control src/Control.cpp)
 #target_link_libraries(control ${catkin_LIBRARIES})
 
-add_library(trace src/trace.cpp)
-target_link_libraries(trace ${catkin_LIBRARIES})
+add_library(human_tracer src/human_tracer.cpp)
+target_link_libraries(human_tracer ${catkin_LIBRARIES})
 
+add_library(human_scanner src/human_scanner.cpp)
+target_link_libraries(human_scanner ${catkin_LIBRARIES})
 
 add_executable(human_disinfector_node src/human_disinfector_node.cpp)
 add_dependencies(human_disinfector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(human_disinfector_node human_detector  trace ${catkin_LIBRARIES})
+target_link_libraries(human_disinfector_node human_detector servo human_tracer human_scanner ${catkin_LIBRARIES})
