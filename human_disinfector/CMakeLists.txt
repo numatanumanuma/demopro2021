@@ -220,9 +220,9 @@ target_link_libraries(human_detector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_library(servo src/FJT.cpp)
 target_link_libraries(servo ${catkin_LIBRARIES})
 
+add_library(control src/Control.cpp)
+target_link_libraries(control ${catkin_LIBRARIES})
+
 add_executable(human_disinfector_node src/human_disinfector_node.cpp)
 add_dependencies(human_disinfector_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(human_disinfector_node human_detector servo ${catkin_LIBRARIES})
-
-
-
+target_link_libraries(human_disinfector_node human_detector servo control ${catkin_LIBRARIES})

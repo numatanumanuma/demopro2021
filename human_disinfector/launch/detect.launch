@@ -1,0 +1,35 @@
+<launch>
+ 
+    <arg name="width" default="1280"/>
+    <arg name="height" default = "720"/>
+    <arg name="fps" default = "5" />
+    <arg name="align_depth" default="true"/>
+    <arg name="enable_pointcloud" default="true"/>
+    
+    <arg name="image" default="/camera/color/image_raw" />
+    
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <!-- <arg name="fisheye_width" value="$(arg width)"/>
+        <arg name="fisheye_height" value="$(arg height)"/>
+        <arg name="depth_width" value="$(arg width)"/>
+        <arg name="depth_height" value="$(arg height)"/>
+        <arg name="confidence_width" value="$(arg width)"/>
+        <arg name="confidence_height" value="$(arg height)"/>
+        <arg name="infra_width" value="$(arg width)"/>
+        <arg name="infra_height" value="$(arg height)"/>
+        <arg name="color_width" value="$(arg width)"/>
+        <arg name="color_height" value="$(arg height)"/>
+        <arg name="filters" value="pointcloud"/>
+        <arg name="fisheye_fps" value="$(arg fps)"/>
+        <arg name="depth_fps" value="$(arg fps)"/>
+        <arg name="infra_fps" value="$(arg fps)"/>
+        <arg name="color_fps" value="$(arg fps)"/> -->
+        <arg name="align_depth" value="$(arg align_depth)"/>
+        <arg name="enable_pointcloud" value="$(arg enable_pointcloud)"/>
+    </include>
+    
+    <include file="$(find darknet_ros)/launch/darknet_ros.launch">
+        <arg name="image" value="$(arg image)"/>
+    </include>
+ 
+</launch>
