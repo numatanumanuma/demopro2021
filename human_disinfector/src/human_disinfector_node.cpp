@@ -56,6 +56,8 @@ int main(int argc, char **argv)
 
     while(ros::ok()) {
 
+        std::cout << "state..." << state << std::endl;
+
         if (debug) {
             state = -1;
             if (kbhit()) {
@@ -109,9 +111,10 @@ int main(int argc, char **argv)
             break;
         case 1:
             // 汚物へGO!!
-            if(checkTimer())
+            if(checkTimer()){
                 player.setSound(mitiwoakero_sound);
                 player.play();
+            }
             if(tracer.run()) {
                 // state = 2;
                 state = -1;
