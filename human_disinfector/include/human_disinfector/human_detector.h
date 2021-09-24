@@ -17,7 +17,7 @@ public:
     ~Detector();
     void msgsCallback(const geometry_msgs::Twist::ConstPtr& msgs);
     void timerCallback(const ros::TimerEvent&);
-    void getHumanDirAndDist(double& dir, double& dist);
+    void getHumanDirAndDist(double& dir, double& dist, double& left, double& right);
    
 private:
     // 取得めんどくさいので直に書き込み

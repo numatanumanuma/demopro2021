@@ -44,8 +44,8 @@ void Detector::publishCurrentTwist(){
     ros::Duration(0.01).sleep();
 }
 
-// 人検出して，その人の方向(yaw)と距離を入れる
-void Detector::getHumanDirAndDist(double& dir, double& dist) {
+// 人検出して，その人の方向(degree)，距離，バウンディングボックスの左端・右端の角度(degree)
+void Detector::getHumanDirAndDist(double& dir, double& dist, double& left, double& right) {
     for(auto bb : bb_results_.bounding_boxes) {
         Disp(bb.Class);
         Disp(bb.probability);
@@ -55,6 +55,8 @@ void Detector::getHumanDirAndDist(double& dir, double& dist) {
             double yaw_ratio = double(camera_width - (bb.xmax - bb.xmin))/double(camera_width);
             dir = yaw_ratio*camera_angle;
             dist = -1;
+            left = double(camera_width - 2*bb.xmin)/double(camera_width)*camera_angle;
+            right = double(camera_width - 2*bb.xmax)/double(camera_width)*camera_angle;
 
             /*
             double tmp_dist = 1e5;
