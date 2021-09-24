@@ -29,13 +29,20 @@ void Tracer::set_goal(double dir, double dist) {
     ref_pose_ = pose_;
 }
 
+void Tracer::set_threshold(double trans, double angle) {
+    if (trans > 0)
+        goal_threshold_trans_ = trans;
+    if (angle > 0)
+        goal_threshold_angle_ = angle;
+}
+
 void Tracer::stop() {
     twist_msg_.linear.x = 0.0;
     twist_msg_.angular.z = 0.0;
     vel_pub_.publish(twist_msg_);
 }
 
-void Tracer::run(){
+bool Tracer::run(){
     double dist_diff = hypot(pose_.position.x - ref_pose_.position.x,
         pose_.position.y - ref_pose_.position.y); // poseとref_poseの距離 
     double yaw_diff = normalize_angle(calcYaw(pose_) - calcYaw(ref_pose_)); // poseとref_poseのなす角度
@@ -43,16 +50,19 @@ void Tracer::run(){
 
     twist_msg_.linear.x = 0.0;
     twist_msg_.angular.z = 0.0;
-    if (dist_diff > goal_threshold_trans_) {
-        twist_msg_.linear.x = LINEAR_VEL;
+    if (dist_diff < goal_trans_ - goal_threshold_trans_) {
+        // twist_msg_.linear.x = LINEAR_VEL;
+        twist_msg_.linear.x = 0.0;
     }
-    if (yaw_diff > goal_threshold_angle_) {
+    if (yaw_diff < goal_angle_ - goal_threshold_angle_) {
         twist_msg_.angular.z = ANGULAR_VEL;
-    } else if (yaw_diff < -goal_threshold_angle_) {
-        twist_msg_.angular.z = ANGULAR_VEL;
+    } else if (yaw_diff > goal_angle_ + goal_threshold_angle_) {
+        twist_msg_.angular.z = -ANGULAR_VEL;
     }
-
     vel_pub_.publish(twist_msg_);
+    if (twist_msg_.linear.x == 0.0 && twist_msg_.angular.z == 0.0)
+        return true;
+    return false;
 }
 
 // int Tracer::Tracer_main(geometry_msgs::Pose pose, geometry_msgs::Pose ref_pose)

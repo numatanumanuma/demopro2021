@@ -4,7 +4,7 @@ Scanner::Scanner(){
     ros::NodeHandle nh("~");
     scan_sub_ = nh.subscribe("/scan", 10, &Scanner::msgsCallback, this);
     timer_ = nh.createTimer(ros::Duration(0.05), &Scanner::timerCallback, this);
-    
+    min_threshold_ = 0.02;
 }
 
 Scanner::~Scanner(){}
@@ -36,7 +36,7 @@ double Scanner::getDist(double degree) {
 /*
  dmin(度)~dmax(度)範囲の一番近い物体の方向(dir(度)), 距離(dist(m))を渡す
 */
-void Scanner::findObstacle(double dir, double dist, int dmin, int dmax) {
+void Scanner::findObstacle(double& dir, double& dist, int dmin, int dmax) {
     int index_min = (- scan_.angle_min + dmin * M_PI / 180) / scan_.angle_increment;
     int index_max = (- scan_.angle_min + dmax * M_PI / 180) / scan_.angle_increment;
     if (index_min > index_max){
@@ -50,7 +50,7 @@ void Scanner::findObstacle(double dir, double dist, int dmin, int dmax) {
     int degree;
     float distance = 1000;
     for (int i = index_min; i <= index_max; i++){
-        if (scan_.ranges[i] < distance){
+        if (scan_.ranges[i] < distance && scan_.ranges[i] > min_threshold_){
             distance = scan_.ranges[i];
             index = i;
         }

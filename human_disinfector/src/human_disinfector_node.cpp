@@ -52,6 +52,7 @@ int main(int argc, char **argv)
     int state = 0;
     double pre_dir = -1;
     double pre_dist = -1;
+    tracer.set_threshold(0.6, -1);
 
     while(ros::ok()) {
 
@@ -96,27 +97,45 @@ int main(int argc, char **argv)
 
         // <--- ここからメイン処理 --->
 
-        if(1) {
-            double dir, dist;
-            // yoloで対象物探索モード
-            detector.getHumanDirAndDist(dir, dist);
-            if (pre_dir != dir && pre_dist != dist) {
-                // 探索物に更新があったら
-                tracer.set_goal(dir, dist);
-                tracer.run();
-            }
-            human_dir   = dir;
-            // human_dist  = dist;
-            human_dist  = scanner.getDist(dir);
-        } else {
-            // 一番近いやつストーカーモード
-        }
-        std::cout << human_dir << ", "<< human_dist << std::endl;
-
         switch (state)
         {
         case 0:
-            std::cout << "iie"<< std::endl;
+            // 汚物探索
+            double dir, dist;
+            detector.getHumanDirAndDist(dir, dist);
+            tracer.set_goal(dir,dist);
+            startTimer(2);
+            state = 1;
+            break;
+        case 1:
+            // 汚物へGO!!
+            if(checkTimer())
+                player.setSound(mitiwoakero_sound);
+                player.play();
+            if(tracer.run()) {
+                // state = 2;
+                state = -1;
+            }
+            break;
+        case 2:
+            // 汚物を消毒
+            player.setSound(obutu_sound);
+            player.play();
+            servo.on();
+            startTimer(5);
+            state = 3;
+            break;
+        case 3:
+            // 汚物消毒中...
+            if(checkTimer())
+                state = 4;
+            break;
+        case 4:
+            // 汚物消毒完了
+            servo.off();
+            state = 5;
+            break;
+        case 5:
             break;
         case -1:
             // debugモードのためスルー

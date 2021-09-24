@@ -36,7 +36,7 @@ void Detector::depthCallback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void Detector::timerCallback(const ros::TimerEvent&){
-    ROS_INFO("x:%0.3f, y:%0.3f", twist_.linear.x, twist_.linear.y);
+    
 }
 
 void Detector::publishCurrentTwist(){
