@@ -105,9 +105,11 @@ int main(int argc, char **argv)
             // 汚物探索
             double dir, dist, left , right;
             detector.getHumanDirAndDist(dir, dist, left, right);
-            tracer.set_goal(dir,dist);
-            startTimer(2);
-            state = 1;
+            if (abs(dir) < 180){
+                tracer.set_goal(dir,dist);
+                startTimer(2);
+                state = 1;
+            }
             break;
         case 1:
             // 汚物へGO!!

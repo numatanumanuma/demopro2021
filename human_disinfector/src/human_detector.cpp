@@ -46,6 +46,9 @@ void Detector::publishCurrentTwist(){
 
 // 人検出して，その人の方向(degree)，距離，バウンディングボックスの左端・右端の角度(degree)
 void Detector::getHumanDirAndDist(double& dir, double& dist, double& left, double& right) {
+    // 追加
+    dir = 10000;
+    dist = -1;
     for(auto bb : bb_results_.bounding_boxes) {
         Disp(bb.Class);
         Disp(bb.probability);
