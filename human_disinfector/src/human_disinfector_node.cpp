@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     int state = 0;
     double pre_dir = -1;
     double pre_dist = -1;
-    tracer.set_threshold(0.6, -1);
+    tracer.set_threshold(0.6, -0.05);
 
     while(ros::ok()) {
 
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
             double dir, dist, left , right;
             detector.getHumanDirAndDist(dir, dist, left, right);
             if (abs(dir) < 180){
-                tracer.set_goal(dir,dist);
+                tracer.set_goal(scanner.getDist(dir), dist);
                 startTimer(2);
                 state = 1;
             }
@@ -116,6 +116,7 @@ int main(int argc, char **argv)
             if(checkTimer()){
                 player.setSound(mitiwoakero_sound);
                 player.play();
+                startTimer(2);
             }
             if(tracer.run()) {
                 // state = 2;

@@ -54,9 +54,12 @@ bool Tracer::run(){
         // twist_msg_.linear.x = LINEAR_VEL;
         twist_msg_.linear.x = 0.0;
     }
-    if (yaw_diff < goal_angle_ - goal_threshold_angle_) {
+    /*
+     yaw_diff > 0 なら左旋回すべし
+    */
+    if (yaw_diff < goal_angle_ - goal_threshold_angle_ && yaw_diff > 0) {
         twist_msg_.angular.z = ANGULAR_VEL;
-    } else if (yaw_diff > goal_angle_ + goal_threshold_angle_) {
+    } else if (yaw_diff > goal_angle_ + goal_threshold_angle_ && yaw_diff < 0) {
         twist_msg_.angular.z = -ANGULAR_VEL;
     }
     vel_pub_.publish(twist_msg_);
