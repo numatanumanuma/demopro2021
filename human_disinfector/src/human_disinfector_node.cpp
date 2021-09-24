@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
     while(ros::ok()) {
 
-        std::cout << "state..." << state << std::endl;
+        // std::cout << "state..." << state << std::endl;
 
         if (debug) {
             state = -1;
@@ -105,8 +105,11 @@ int main(int argc, char **argv)
             // 汚物探索
             double dir, dist, left , right;
             detector.getHumanDirAndDist(dir, dist, left, right);
+            human_dir = dir ;
+            human_dist = scanner.getDist(dir); 
+            std::cout << human_dir << ", " << human_dist << std::endl;
             if (abs(dir) < 180){
-                tracer.set_goal(scanner.getDist(dir), dist);
+                tracer.set_goal(human_dir, human_dist);
                 startTimer(2);
                 state = 1;
             }
@@ -119,8 +122,10 @@ int main(int argc, char **argv)
                 startTimer(2);
             }
             if(tracer.run()) {
-                // state = 2;
-                state = -1;
+            // if(1){
+                state = 2;
+                // startTimer(3);
+                // state = 5;
             }
             break;
         case 2:
@@ -142,6 +147,9 @@ int main(int argc, char **argv)
             state = 5;
             break;
         case 5:
+            if(checkTimer()){
+                state = 0;
+            }
             break;
         case -1:
             // debugモードのためスルー

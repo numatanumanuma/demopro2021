@@ -8,7 +8,7 @@
     
     <arg name="image" default="/camera/color/image_raw" />
     
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!-- <include file="$(find realsense2_camera)/launch/rs_camera.launch"> -->
         <!-- <arg name="fisheye_width" value="$(arg width)"/>
         <arg name="fisheye_height" value="$(arg height)"/>
         <arg name="depth_width" value="$(arg width)"/>
@@ -24,9 +24,9 @@
         <arg name="depth_fps" value="$(arg fps)"/>
         <arg name="infra_fps" value="$(arg fps)"/>
         <arg name="color_fps" value="$(arg fps)"/> -->
-        <arg name="align_depth" value="$(arg align_depth)"/>
-        <arg name="enable_pointcloud" value="$(arg enable_pointcloud)"/>
-    </include>
+        <!-- <arg name="align_depth" value="$(arg align_depth)"/>
+        <arg name="enable_pointcloud" value="$(arg enable_pointcloud)"/> -->
+    <!-- </include> -->
     
     <include file="$(find darknet_ros)/launch/darknet_ros.launch">
         <arg name="image" value="$(arg image)"/>
@@ -34,7 +34,7 @@
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
         <remap from="/usb_cam/image_raw" to="$(arg image)"/>
-        <param name="video_device" value="/dev/video1" />
+        <param name="video_device" value="/dev/video2" />
         <!-- <param name="image_width" value="320" />
         <param name="image_height" value="240" /> -->
         <param name="pixel_format" value="mjpeg" />

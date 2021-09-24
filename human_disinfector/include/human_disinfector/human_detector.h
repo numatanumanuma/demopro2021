@@ -22,8 +22,8 @@ public:
 private:
     // 取得めんどくさいので直に書き込み
     const int camera_height = 480;
-    const int camera_width = 848;
-    const double camera_angle = 69.4;
+    const int camera_width = 640;
+    const double camera_angle = 45;
 
     const int dist_search_range = 10; // デプス情報を探す範囲
     void darknetCallback(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg);

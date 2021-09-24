@@ -51,8 +51,8 @@ bool Tracer::run(){
     twist_msg_.linear.x = 0.0;
     twist_msg_.angular.z = 0.0;
     if (dist_diff < goal_trans_ - goal_threshold_trans_) {
-        // twist_msg_.linear.x = LINEAR_VEL;
-        twist_msg_.linear.x = 0.0;
+        twist_msg_.linear.x = LINEAR_VEL;
+        // twist_msg_.linear.x = 0.0;
     }
     /*
      yaw_diff > 0 なら左旋回すべし

@@ -50,12 +50,12 @@ void Detector::getHumanDirAndDist(double& dir, double& dist, double& left, doubl
     dir = 10000;
     dist = -1;
     for(auto bb : bb_results_.bounding_boxes) {
-        Disp(bb.Class);
-        Disp(bb.probability);
+        // Disp(bb.Class);
+        // Disp(bb.probability);
         if(bb.Class == "person" && bb.probability >= 0.5) {
-            int xcenter = (bb.xmax - bb.xmin)/2;
-            int ycenter = (bb.ymax - bb.ymin)/2;
-            double yaw_ratio = double(camera_width - (bb.xmax - bb.xmin))/double(camera_width);
+            int xcenter = (bb.xmax + bb.xmin)/2;
+            int ycenter = (bb.ymax + bb.ymin)/2;
+            double yaw_ratio = double(camera_width - (bb.xmax + bb.xmin))/double(camera_width);
             dir = yaw_ratio*camera_angle;
             dist = -1;
             left = double(camera_width - 2*bb.xmin)/double(camera_width)*camera_angle;
