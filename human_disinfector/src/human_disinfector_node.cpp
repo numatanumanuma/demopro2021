@@ -101,8 +101,8 @@ int main(int argc, char **argv)
         {
         case 0:
             // 汚物探索
-            double dir, dist;
-            detector.getHumanDirAndDist(dir, dist);
+            double dir, dist, left , right;
+            detector.getHumanDirAndDist(dir, dist, left, right);
             tracer.set_goal(dir,dist);
             startTimer(2);
             state = 1;
