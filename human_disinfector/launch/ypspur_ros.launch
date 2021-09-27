@@ -3,7 +3,7 @@
     <node pkg="ypspur_ros" name="ypspur_ros" type="ypspur_ros" respawn="true" output="screen">
         <remap from="/ypspur_ros/cmd_vel" to="/cmd_vel"/>
         <remap from="/ypspur_ros/odom" to="/odom"/>
-        <param name="param_file" value="/home/$(env USER)/researches/programs/platform/yp-robot-params/robot-params/speego.param"/>
+        <param name="param_file" value="$(find human_disinfector)/param/beego_syodokun.param"/>
         <param name="port" value="/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00"/>
     </node>
 

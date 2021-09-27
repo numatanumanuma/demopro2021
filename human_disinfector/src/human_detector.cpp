@@ -2,7 +2,6 @@
    
 Detector::Detector(){
     ros::NodeHandle nh("~");
-    twist_pub_ = nh.advertise<geometry_msgs::Twist>("/sample/cmd_vel", 10);
     darknet_sub_ = nh.subscribe("/darknet_ros/bounding_boxes", 100,
         &Detector::darknetCallback, this);
     // depth_sub_ = nh.subscribe("/camera/aligned_depth_to_color/image_raw", 100,

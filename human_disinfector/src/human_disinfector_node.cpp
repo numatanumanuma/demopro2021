@@ -11,6 +11,10 @@
 #include "human_disinfector/FJT.h"
 #include "kbhit.h"
 
+#define POS_TOLERANCE 0.001        // 状態遷移時に許容する位置誤差 [m]
+#define RAD_TOLERANCE M_PI * 10 / 180.0 // 状態遷移時に許容する角度誤差 [rad]
+#define HUMAN_TOLERANCE 0.4
+
 ros::Time start_t;
 ros::Duration limit_t;
 void startTimer(double t) {
@@ -44,6 +48,7 @@ int main(int argc, char **argv)
     SoundPlayer player;
     Tracer tracer;
     Scanner scanner;
+    ros::Duration(1).sleep();
     ros::spinOnce();
 
     double human_dir = 0;
@@ -52,11 +57,14 @@ int main(int argc, char **argv)
     int state = 0;
     double pre_dir = -1;
     double pre_dist = -1;
-    tracer.set_threshold(0.6, -0.05);
+
+    geometry_msgs::Pose pose; // 現在の姿勢
+    geometry_msgs::Pose ref_pose; // 基準となる姿勢
+    tracer.getCurrentPose(ref_pose); // はじめの姿勢を基準として保存
 
     while(ros::ok()) {
 
-        // std::cout << "state..." << state << std::endl;
+        std::cout << "state..." << state << std::endl;
 
         if (debug) {
             state = -1;
@@ -99,6 +107,12 @@ int main(int argc, char **argv)
 
         // <--- ここからメイン処理 --->
 
+        tracer.getCurrentPose(pose); // 現在の姿勢を取得
+        double dist_diff = hypot(pose.position.x - ref_pose.position.x,
+                                 pose.position.y - ref_pose.position.y);
+        double yaw_diff = tracer.normalize_angle(tracer.calcYaw(pose) - tracer.calcYaw(ref_pose));
+        std::cout << "state:" << state << ", dist:" << dist_diff << ",  yaw:" << yaw_diff << std::endl;
+
         switch (state)
         {
         case 0:
@@ -108,45 +122,74 @@ int main(int argc, char **argv)
             human_dir = dir ;
             human_dist = scanner.getDist(dir); 
             std::cout << human_dir << ", " << human_dist << std::endl;
-            if (abs(dir) < 180){
+            if (abs(human_dir) < 180){
                 tracer.set_goal(human_dir, human_dist);
                 startTimer(2);
                 state = 1;
             }
             break;
         case 1:
-            // 汚物へGO!!
+            // 汚物へGO!!(旋回)
             if(checkTimer()){
                 player.setSound(mitiwoakero_sound);
                 player.play();
                 startTimer(2);
             }
-            if(tracer.run()) {
-            // if(1){
-                state = 2;
-                // startTimer(3);
-                // state = 5;
+            if(human_dir > 0){
+                // 左旋回
+                tracer.spinLeft();
+                if (yaw_diff > human_dir * M_PI / 180 - RAD_TOLERANCE)
+                {
+                    tracer.getCurrentPose(ref_pose);
+                    tracer.stop();
+                    state = 2;
+                }
+            } else {
+                // 右旋回
+                tracer.spinRight();
+                if (yaw_diff < human_dir * M_PI / 180 + RAD_TOLERANCE)
+                {
+                    tracer.getCurrentPose(ref_pose);
+                    tracer.stop();
+                    state = 2;
+                }
             }
             break;
         case 2:
+            // 汚物へGO!!(直進)
+            if(checkTimer()){
+                player.setSound(mitiwoakero_sound);
+                player.play();
+                startTimer(2);
+            }
+            tracer.straight(); // 直進
+            if (dist_diff > human_dist - HUMAN_TOLERANCE - POS_TOLERANCE)
+            { 
+                tracer.getCurrentPose(ref_pose);
+                tracer.stop();
+                state = 3;
+            }
+            break;
+        case 3:
             // 汚物を消毒
             player.setSound(obutu_sound);
             player.play();
             servo.on();
             startTimer(5);
-            state = 3;
-            break;
-        case 3:
-            // 汚物消毒中...
-            if(checkTimer())
-                state = 4;
+            state = 4;
             break;
         case 4:
-            // 汚物消毒完了
-            servo.off();
-            state = 5;
+            // 汚物消毒中...
+            if(checkTimer())
+                state = 5;
             break;
         case 5:
+            // 汚物消毒完了
+            servo.off();
+            state = 6;
+            startTimer(3);
+            break;
+        case 6:
             if(checkTimer()){
                 state = 0;
             }

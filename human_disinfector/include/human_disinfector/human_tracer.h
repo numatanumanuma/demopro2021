@@ -9,11 +9,9 @@
 #include <math.h>
 #include <fstream>
 #include <vector>
- 
-#define POS_TOLERANCE 0.001        // 状態遷移時に許容する位置誤差 [m]
-#define RAD_TOLERANCE M_PI / 180.0 // 状態遷移時に許容する角度誤差 [rad]
-#define LINEAR_VEL 0.4            // ロボットの並進速度 [m/s]
-#define ANGULAR_VEL 0.9
+
+#define LINEAR_VEL 0.2           // ロボットの並進速度 [m/s]
+#define ANGULAR_VEL 0.3
 
 class Tracer{
     private:
@@ -25,6 +23,9 @@ class Tracer{
         geometry_msgs::Pose pose_; // 現在の位置・姿勢
         sensor_msgs::LaserScan scan_; // 現在のセンサ情報
 
+        double ref_x_;
+        double ref_y_;
+        double ref_yaw_;
         // 目標点までの距離角度
         double goal_angle_;
         double goal_trans_;
@@ -33,21 +34,20 @@ class Tracer{
         double goal_threshold_trans_;
     
     public:
-        Tracer(){
-            ros::NodeHandle nh;
-            odom_sub_ = nh.subscribe("/odom", 10, &Tracer::odomCallback, this);
-            vel_pub_    = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
-            goal_threshold_angle_ = 0.02;
-            goal_threshold_trans_ = 1.0;
-        }
+        Tracer();
         double normalize_angle(double); 
         // int Tracer_main(geometry_msgs::Pose, geometry_msgs::Pose);
         double calcYaw(geometry_msgs::Pose);
         void odomCallback(const nav_msgs::Odometry::ConstPtr& msg);
+        void getCurrentPose(geometry_msgs::Pose& pose);
         void set_goal(double dir, double dist);
         void set_threshold(double trans, double angle);
+        void straight();
+        void spinLeft();
+        void spinRight();
         void stop();
-        bool run();
+        
+        // bool run();
 };
 
 #endif

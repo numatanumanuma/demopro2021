@@ -5,7 +5,7 @@
     <node pkg="human_disinfector" name="human_disinfector" type="human_disinfector_node" output="screen" respawn="true">
         <param name="obutu_sound" value="$(arg path)obutuhasyoudokuda.wav"/>
         <param name="mitiwoakero_sound" value="$(arg path)mitiwoakero.wav"/>
-        <param name="debug" value="false"/>
+        <param name="debug" value="true"/>
     </node>
 
 </launch>

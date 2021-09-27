@@ -1,5 +1,13 @@
 #include "human_disinfector/human_tracer.h"
 
+Tracer::Tracer(){
+    ros::NodeHandle nh;
+    odom_sub_ = nh.subscribe("/odom", 10, &Tracer::odomCallback, this);
+    vel_pub_    = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+    goal_threshold_angle_ = 0.02;
+    goal_threshold_trans_ = 1.0;
+}
+
 void Tracer::odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
     pose_ = msg->pose.pose;
@@ -17,16 +25,23 @@ double Tracer::normalize_angle(double angle)
 { // 角度を-π〜+πに正規化する関数
     double result = angle;
     while (result > M_PI)
-    result -= 2.0 * M_PI;
+        result -= 2.0 * M_PI;
     while (result < -M_PI)
-    result += 2.0 * M_PI;
+        result += 2.0 * M_PI;
     return result;
+}
+
+void Tracer::getCurrentPose(geometry_msgs::Pose& pose)
+{ // 現在の姿勢を取得する関数
+    pose = pose_;
 }
 
 void Tracer::set_goal(double dir, double dist) {
     goal_angle_ = dir * M_PI / 180;
     goal_trans_ = dist;
-    ref_pose_ = pose_;
+    ref_x_ = pose_.position.x;
+    ref_y_ = pose_.position.y;
+    ref_yaw_ = calcYaw(pose_);
 }
 
 void Tracer::set_threshold(double trans, double angle) {
@@ -36,37 +51,38 @@ void Tracer::set_threshold(double trans, double angle) {
         goal_threshold_angle_ = angle;
 }
 
-void Tracer::stop() {
-    twist_msg_.linear.x = 0.0;
-    twist_msg_.angular.z = 0.0;
-    vel_pub_.publish(twist_msg_);
+void Tracer::straight(void)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = LINEAR_VEL;
+    msg.angular.z = 0.0;
+    vel_pub_.publish(msg);
 }
 
-bool Tracer::run(){
-    double dist_diff = hypot(pose_.position.x - ref_pose_.position.x,
-        pose_.position.y - ref_pose_.position.y); // poseとref_poseの距離 
-    double yaw_diff = normalize_angle(calcYaw(pose_) - calcYaw(ref_pose_)); // poseとref_poseのなす角度
-    std::cout << "dist:" << dist_diff << ", yaw:" << yaw_diff << std::endl;
-
-    twist_msg_.linear.x = 0.0;
-    twist_msg_.angular.z = 0.0;
-    if (dist_diff < goal_trans_ - goal_threshold_trans_) {
-        twist_msg_.linear.x = LINEAR_VEL;
-        // twist_msg_.linear.x = 0.0;
-    }
-    /*
-     yaw_diff > 0 なら左旋回すべし
-    */
-    if (yaw_diff < goal_angle_ - goal_threshold_angle_ && yaw_diff > 0) {
-        twist_msg_.angular.z = ANGULAR_VEL;
-    } else if (yaw_diff > goal_angle_ + goal_threshold_angle_ && yaw_diff < 0) {
-        twist_msg_.angular.z = -ANGULAR_VEL;
-    }
-    vel_pub_.publish(twist_msg_);
-    if (twist_msg_.linear.x == 0.0 && twist_msg_.angular.z == 0.0)
-        return true;
-    return false;
+void Tracer::spinRight(void)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = 0.0;
+    msg.angular.z = -ANGULAR_VEL;
+    vel_pub_.publish(msg);
 }
+
+void Tracer::spinLeft(void)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = 0.0;
+    msg.angular.z = ANGULAR_VEL;
+    vel_pub_.publish(msg);
+}
+
+void Tracer::stop(void)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = 0.0;
+    msg.angular.z = 0.0;
+    vel_pub_.publish(msg);
+}
+
 
 // int Tracer::Tracer_main(geometry_msgs::Pose pose, geometry_msgs::Pose ref_pose)
 // {

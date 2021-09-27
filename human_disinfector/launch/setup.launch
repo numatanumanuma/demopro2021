@@ -1,0 +1,41 @@
+<launch>
+
+    <arg name="image" default="/camera/color/image_raw" />
+
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+        <param name="port" value="/dev/ttyACM0"/>
+    </node>
+
+    <node pkg="sound_play" name="sound_play" type="soundplay_node.py" output="screen" respawn="true"/>
+
+    <node pkg="ypspur_ros" name="ypspur_ros" type="ypspur_ros" respawn="true" output="screen">
+        <remap from="/ypspur_ros/cmd_vel" to="/cmd_vel"/>
+        <remap from="/ypspur_ros/odom" to="/odom"/>
+        <param name="param_file" value="$(find human_disinfector)/param/beego_syodokun.param"/>
+        <param name="port" value="/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00"/>
+    </node>
+
+    <node pkg="urg_node" name="urg_node" type="urg_node" required="true">
+        <param name="serial_port" value="/dev/serial/by-id/usb-Hokuyo_Data_Flex_for_USB_URG-Series_USB_Driver-if00" />
+        <remap from="scan" to="scan"/>
+    </node>
+
+    <include file="$(find darknet_ros)/launch/darknet_ros.launch">
+        <arg name="image" value="$(arg image)"/>
+    </include>
+
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <remap from="/usb_cam/image_raw" to="$(arg image)"/>
+        <param name="video_device" value="/dev/video1" />
+        <!-- <param name="image_width" value="320" />
+        <param name="image_height" value="240" /> -->
+        <param name="pixel_format" value="mjpeg" />
+        <param name="framerate" value="30" />
+        <param name="contrast" value="32" />
+        <param name="brightness" value="32" />
+        <param name="saturation" value="32" />
+        <param name="autofocus" value="true" />
+        <param name="focus" value="51" />
+    </node>
+
+</launch>
